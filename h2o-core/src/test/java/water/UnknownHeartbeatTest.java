@@ -3,6 +3,9 @@ package water;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.Assert.assertEquals;
 public class UnknownHeartbeatTest extends TestUtil{
   @BeforeClass() public static void setup() {
@@ -41,7 +44,13 @@ public class UnknownHeartbeatTest extends TestUtil{
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-    // If we got here without exception we're good
+    Collection<H2OListenerExtension> listenerExtensions = ExtensionManager.getInstance().getListenerExtensions();
+    for(H2OListenerExtension ext: listenerExtensions){
+      ArrayList<Object[]> shutdown_success = ext.getData("shutdown_fail");
+      assertEquals( 2, shutdown_success.size());
+      assertEquals( 1, shutdown_success.get(0).length);
+      assertEquals( 777, (int)shutdown_success.get(0)[0]);
+    }
   }
 
   @Test
@@ -56,6 +65,12 @@ public class UnknownHeartbeatTest extends TestUtil{
       Thread.sleep(2000);
     } catch (InterruptedException e) {
       e.printStackTrace();
+    }
+
+    Collection<H2OListenerExtension> listenerExtensions = ExtensionManager.getInstance().getListenerExtensions();
+    for(H2OListenerExtension ext: listenerExtensions){
+      ArrayList<Object[]> shutdown_success = ext.getData("shutdown_ignored");
+      assertEquals( 2, shutdown_success.size());
     }
   }
 

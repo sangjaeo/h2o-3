@@ -28,10 +28,12 @@ public class ExtensionManager {
 
   private HashMap<String, AbstractH2OExtension> coreExtensions = new HashMap<>();
   private HashMap<String, RestApiExtension> restApiExtensions = new HashMap<>();
+  private HashMap<String, H2OListenerExtension> listenerExtensions = new HashMap<>();
   private long registerCoreExtensionsMillis = 0;
   // Be paranoid and check that this doesn't happen twice.
   private boolean extensionsRegistered = false;
   private boolean restApiExtensionsRegistered = false;
+  private boolean listenerExtensionsRegistered = false;
 
 
   public Collection<AbstractH2OExtension> getCoreExtensions() {
@@ -146,6 +148,10 @@ public class ExtensionManager {
     return coreExtensions.keySet().toArray(new String[coreExtensions.keySet().size()]);
   }
 
+  private String[] getListenerExtensionNames(){
+    return listenerExtensions.keySet().toArray(new String[listenerExtensions.keySet().size()]);
+  }
+
   public boolean isCoreExtensionEnabled(String name) {
     if (coreExtensions.containsKey(name)) {
       return coreExtensions.get(name).isEnabled();
@@ -153,4 +159,34 @@ public class ExtensionManager {
       return false;
     }
   }
+
+  /**
+   * Register various listener extensions
+   *
+   * Use reflection to find all classes that inherit from {@link water.api.AbstractRegister}
+   * and call the register() method for each.
+   *
+   */
+  public void registerListenerExtensions() {
+    if (listenerExtensionsRegistered) {
+      throw H2O.fail("Listeners already registered");
+    }
+
+    long before = System.currentTimeMillis();
+    ServiceLoader<H2OListenerExtension> extensionsLoader = ServiceLoader.load(H2OListenerExtension.class);
+    for (H2OListenerExtension ext : extensionsLoader) {
+      ext.init();
+      listenerExtensions.put(ext.getName(), ext);
+    }
+    listenerExtensionsRegistered = true;
+    long registerListenersMillis = System.currentTimeMillis() - before;
+    Log.info("Registered: " + getCoreExtensionNames().length + " listeners in: " + registerListenersMillis + "ms");
+    Log.info("Registered REST API extensions: " + Arrays.toString(getListenerExtensionNames()));
+
+  }
+
+  public Collection<H2OListenerExtension> getListenerExtensions(){
+    return listenerExtensions.values();
+  }
+
 }

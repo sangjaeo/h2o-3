@@ -50,8 +50,15 @@ public class UDPRebooted extends UDP {
       int cloud_name_hash_origin = ab.getInt();
       if (cloud_name_hash_origin == H2O.SELF._heartbeat._cloud_name_hash) {
         suicide(T.values()[shutdownPacketType], ab._h2o);
+      }else {
+        for (H2OListenerExtension ext : ExtensionManager.getInstance().getListenerExtensions()) {
+          ext.report("shutdown_fail", cloud_name_hash_origin);
+        }
       }
     }else{
+      for(H2OListenerExtension ext: ExtensionManager.getInstance().getListenerExtensions()){
+        ext.report("shutdown_ignored");
+      }
       Log.warn("Receive "+ T.values()[shutdownPacketType].toString()+ " request from H2O with older version than 3.14.0.4. This request" +
               " will be ignored");
     }
