@@ -30,6 +30,7 @@ public class ExtensionManager {
   private HashMap<String, RestApiExtension> restApiExtensions = new HashMap<>();
   private HashMap<String, H2OListenerExtension> listenerExtensions = new HashMap<>();
   private long registerCoreExtensionsMillis = 0;
+  private long registerListenerExtensionsMillis = 0;
   // Be paranoid and check that this doesn't happen twice.
   private boolean extensionsRegistered = false;
   private boolean restApiExtensionsRegistered = false;
@@ -100,6 +101,9 @@ public class ExtensionManager {
     }
     Log.info("Registered " + coreExtensions.size() + " core extensions in: " + registerCoreExtensionsMillis + "ms");
     Log.info("Registered H2O core extensions: " + Arrays.toString(getCoreExtensionNames()));
+
+    Log.info("Registered: " + getCoreExtensionNames().length + " listener extensions in: " + registerListenerExtensionsMillis + "ms");
+    Log.info("Registered Listeners extensions: " + Arrays.toString(getListenerExtensionNames()));
 
     long before = System.currentTimeMillis();
     RequestServer.DummyRestApiContext dummyRestApiContext = new RequestServer.DummyRestApiContext();
@@ -179,10 +183,7 @@ public class ExtensionManager {
       listenerExtensions.put(ext.getName(), ext);
     }
     listenerExtensionsRegistered = true;
-    long registerListenersMillis = System.currentTimeMillis() - before;
-    Log.info("Registered: " + getCoreExtensionNames().length + " listeners in: " + registerListenersMillis + "ms");
-    Log.info("Registered REST API extensions: " + Arrays.toString(getListenerExtensionNames()));
-
+    registerListenerExtensionsMillis = System.currentTimeMillis() - before;
   }
 
   public Collection<H2OListenerExtension> getListenerExtensions(){
