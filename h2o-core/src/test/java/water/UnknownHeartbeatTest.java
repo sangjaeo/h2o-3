@@ -27,9 +27,13 @@ public class UnknownHeartbeatTest extends TestUtil{
 
   @Test
   public void testIgnoreUnknownShutdownTask(){
-    AutoBuffer ab = new AutoBuffer(H2O.SELF, UDP.udp.rebooted._prior);
-    ab.putUdp(UDP.udp.rebooted, 65400).put1(42).put1(UDPRebooted.T.error.ordinal()).putInt(777); // 777 is the hashcode of the origin cloud
-    ab.close();
+
+    new AutoBuffer(H2O.SELF, UDP.udp.rebooted._prior)
+            .putUdp(UDP.udp.rebooted, 65400)
+            .put1(UDPRebooted.MAGIC_SAFE_CLUSTER_KILL_BYTE)
+            .put1(UDPRebooted.T.error.ordinal())
+            .putInt(777) // 777 is the hashcode of the origin cloud
+            .close();
 
     // Give it time so the packet can arrive
     try {
