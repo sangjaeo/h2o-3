@@ -1,0 +1,6 @@
+@Library('h2o3-shared-lib') _
+
+buildH2O {
+  mode = 'merge'
+  testsSize = 'small'
+}
