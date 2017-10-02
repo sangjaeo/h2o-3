@@ -143,6 +143,10 @@ public abstract class Paxos {
   // stabilizes.  After we start doing distributed writes, it is an error to
   // change cloud shape - the distributed writes will be in the wrong place.
   static void lockCloud(Object reason) {
+    Log.info("REASON"+ reason);
+    for(StackTraceElement e: Thread.currentThread().getStackTrace()){
+      Log.info(e.toString());
+    }
     if( _cloudLocked ) return; // Fast-path cutout
     lockCloud_impl(reason);
   }
