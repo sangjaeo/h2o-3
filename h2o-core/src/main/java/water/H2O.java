@@ -1498,10 +1498,6 @@ final public class H2O {
     SELF._heartbeat._jar_md5 = JarHash.JARHASH;
     SELF._heartbeat._client = ARGS.client;
     SELF._heartbeat._cloud_name_hash = ARGS.name.hashCode();
-
-    if(ARGS.client){
-      reportClient(H2O.SELF); // report myself as the client to myself
-    }
   }
 
   /** Starts the worker threads, receiver threads, heartbeats and all other
